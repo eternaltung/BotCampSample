@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -22,11 +23,30 @@ namespace BotCampDemo
 			if (activity.Type == ActivityTypes.Message)
 			{
 				ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
-				// calculate something for us to return
-				int length = (activity.Text ?? string.Empty).Length;
+				Activity reply = activity.CreateReply();
 
-				// return our reply to the user
-				Activity reply = activity.CreateReply($"You sent {activity.Text} which was {length} characters");
+				List<Attachment> att = new List<Attachment>();
+				att.Add(new HeroCard()
+				{
+					Title = "iPad Pro",
+					Images = new List<CardImage>() { new CardImage("https://s.yimg.com/wb/images/936392DB6B69D9C6D1B897B8DAB20AE595E96FA4") },
+					Buttons = new List<CardAction>()
+						{
+							new CardAction(ActionTypes.OpenUrl, "Yahoo購物中心", value: $"https://tw.buy.yahoo.com/gdsale/MM172-6798747.html")
+						}
+				}.ToAttachment());
+				att.Add(new HeroCard()
+				{
+					Title = "Surface Pro",
+					Images = new List<CardImage>() { new CardImage("https://s.yimg.com/wb/images/268917ABD27238C9A20428002A8143AEEF40A048") },
+					Buttons = new List<CardAction>()
+						{
+							new CardAction(ActionTypes.OpenUrl, "Yahoo購物中心", value: $"https://tw.buy.yahoo.com/gdsale/gdsale.asp?act=gdsearch&gdid=6561885")
+						}
+				}.ToAttachment());
+				reply.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+				reply.Attachments = att;
+
 				await connector.Conversations.ReplyToActivityAsync(reply);
 			}
 			else
