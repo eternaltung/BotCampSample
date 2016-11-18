@@ -27,7 +27,16 @@ namespace BotCampDemo
 				//Trace.TraceInformation(JsonConvert.SerializeObject(activity, Formatting.Indented));
 				ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
 				Activity reply = activity.CreateReply();
-				TemplateByChannelData(reply);
+
+				if (activity.Attachments?.Count > 0 && activity.Attachments.First().ContentType.StartsWith("image/"))
+				{
+					ImageTemplate(reply, activity.Attachments.First().ContentUrl);
+				}
+				else
+				{
+					reply.Text = activity.From.Id;
+				}
+				
 				await connector.Conversations.ReplyToActivityAsync(reply);
 			}
 			else
@@ -109,6 +118,47 @@ namespace BotCampDemo
 			}.ToAttachment());
 			reply.AttachmentLayout = AttachmentLayoutTypes.Carousel;
 			reply.Attachments = att;
+		}
+
+		private void ImageTemplate(Activity reply, string url)
+		{
+			var element = new List<object>()
+			{
+				new
+				{
+					title = "Cognitive services?",
+					subtitle = "Select from below",
+					image_url = url,
+					buttons = new List<object>()
+					{
+						new
+						{
+							type = "postback",
+							title = "男女生",
+							payload = $"Face>{url}"
+						},
+						new
+						{
+							type = "postback",
+							title = "辨識圖片",
+							payload= $"Analyze>{url}"
+						}
+					}
+				}
+			};
+
+			reply.ChannelData = JObject.FromObject(new
+			{
+				attachment = new
+				{
+					type = "template",
+					payload = new
+					{
+						template_type = "generic",
+						elements = element
+					}
+				}
+			});
 		}
 
 		private Activity HandleSystemMessage(Activity message)
