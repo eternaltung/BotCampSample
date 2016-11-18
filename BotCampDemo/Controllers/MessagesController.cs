@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Description;
+using BotCampDemo.Model;
 using Microsoft.Bot.Connector;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -34,7 +35,19 @@ namespace BotCampDemo
 				}
 				else
 				{
-					reply.Text = activity.From.Id;
+					var fbData = JsonConvert.DeserializeObject<FBChannelModel>(activity.ChannelData.ToString());
+					if (fbData.postback != null)
+					{
+						if (fbData.postback.payload.StartsWith("Face>"))
+						{
+						}
+						else if (fbData.postback.payload.StartsWith("Analyze>"))
+						{
+							//vision
+						}
+					}
+					else
+						reply.Text = activity.From.Id;
 				}
 				
 				await connector.Conversations.ReplyToActivityAsync(reply);
