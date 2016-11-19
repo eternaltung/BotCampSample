@@ -9,6 +9,7 @@ using System.Web.Http;
 using System.Web.Http.Description;
 using BotCampDemo.Model;
 using Microsoft.Bot.Connector;
+using Microsoft.ProjectOxford.Vision;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -40,10 +41,15 @@ namespace BotCampDemo
 					{
 						if (fbData.postback.payload.StartsWith("Face>"))
 						{
+							//faceAPI
 						}
 						else if (fbData.postback.payload.StartsWith("Analyze>"))
 						{
-							//vision
+							//辨識圖片
+							string url = fbData.postback.payload.Split('>')[1];
+							VisionServiceClient client = new VisionServiceClient("");
+							var result = await client.AnalyzeImageAsync(url, new VisualFeature[] { VisualFeature.Description });
+							reply.Text = result.Description.Captions.First().Text;
 						}
 					}
 					else
