@@ -44,7 +44,7 @@ namespace BotCampDemo.Model
 		public string mid { get; set; }
 		public int seq { get; set; }
 		public string text { get; set; }
-		public List<Attachment> attachments { get; set; }
+		public List<FBAttachment> attachments { get; set; }
 		public QuickReplyMessage quick_reply { get; set; }
 		public string sticker_id { get; set; }
 	}
@@ -54,7 +54,7 @@ namespace BotCampDemo.Model
 		public string payload { get; set; }
 	}
 
-	public class Attachment
+	public class FBAttachment
 	{
 		public string title { get; set; }
 		public string url { get; set; }

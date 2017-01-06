@@ -30,7 +30,7 @@ namespace BotCampDemo
 				ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
 				Activity reply = activity.CreateReply();
 
-				if (activity.Attachments?.Count > 0 && activity.Attachments.First().ContentType.StartsWith("image/"))
+				if (activity.Attachments?.Count > 0 && activity.Attachments.First().ContentType.StartsWith("image"))
 				{
 					ImageTemplate(reply, activity.Attachments.First().ContentUrl);
 				}
@@ -141,43 +141,20 @@ namespace BotCampDemo
 
 		private void ImageTemplate(Activity reply, string url)
 		{
-			var element = new List<object>()
+			List<Attachment> att = new List<Attachment>();
+			att.Add(new HeroCard()
 			{
-				new
+				Title = "Cognitive services",
+				Subtitle = "Select from below",
+				Images = new List<CardImage>() { new CardImage(url) },
+				Buttons = new List<CardAction>()
 				{
-					title = "Cognitive services?",
-					subtitle = "Select from below",
-					image_url = url,
-					buttons = new List<object>()
-					{
-						new
-						{
-							type = "postback",
-							title = "男女生",
-							payload = $"Face>{url}"
-						},
-						new
-						{
-							type = "postback",
-							title = "辨識圖片",
-							payload= $"Analyze>{url}"
-						}
-					}
+					new CardAction(ActionTypes.PostBack, "男女生", value: $"Face>{url}"),
+					new CardAction(ActionTypes.PostBack, "辨識圖片", value: $"Analyze>{url}")
 				}
-			};
-
-			reply.ChannelData = JObject.FromObject(new
-			{
-				attachment = new
-				{
-					type = "template",
-					payload = new
-					{
-						template_type = "generic",
-						elements = element
-					}
-				}
-			});
+			}.ToAttachment());
+			
+			reply.Attachments = att;
 		}
 
 		private Activity HandleSystemMessage(Activity message)
