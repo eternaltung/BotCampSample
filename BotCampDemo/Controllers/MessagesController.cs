@@ -9,6 +9,7 @@ using System.Web.Http;
 using System.Web.Http.Description;
 using BotCampDemo.Model;
 using Microsoft.Bot.Connector;
+using Microsoft.Cognitive.LUIS;
 using Microsoft.ProjectOxford.Face;
 using Microsoft.ProjectOxford.Vision;
 using Newtonsoft.Json;
@@ -57,7 +58,22 @@ namespace BotCampDemo
 						}
 					}
 					else
-						reply.Text = activity.From.Id;
+					{
+						using (LuisClient client = new LuisClient("appid", "key"))
+						{
+							var result = await client.Predict(activity.Text);
+							if (result.Intents.Count() <= 0 || result.TopScoringIntent.Name != "查匯率")
+							{
+								reply.Text = "看不懂";
+							}
+							else
+							{
+								var currency = result.Entities?.Where(x => x.Key.StartsWith("幣別"))?.First().Value[0].Value;
+								// ask api
+								reply.Text = $"{currency}價格是30.0";
+							}
+						}
+					}
 				}
 				
 				await connector.Conversations.ReplyToActivityAsync(reply);
