@@ -64,14 +64,6 @@ namespace BotCampDemo.Model
 
 	public class Payload
 	{
-		public Coordinates coordinates { get; set; }
 		public string url { get; set; }
-	}
-
-	public class Coordinates
-	{
-		public float lat { get; set; }
-		[JsonProperty("long")]
-		public float lng { get; set; }
 	}
 }
